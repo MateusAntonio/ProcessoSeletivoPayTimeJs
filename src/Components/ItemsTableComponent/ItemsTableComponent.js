@@ -1,10 +1,8 @@
-import React, { Component } from "react";
+import React from "react";
 import { Table } from "antd";
 
-class TableComponent extends Component {
-  render() {
-    return <Table></Table>;
-  }
-}
+const TableComponent = props => {
+  return <Table dataSource={props.dataSource} columns={props.columns}></Table>;
+};
 
 export default TableComponent;
