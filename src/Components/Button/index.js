@@ -6,19 +6,21 @@ import "./style.css";
 // likda com a escolha de cor e texto para a tag
 class Button extends Component {
   render() {
+    let btnProps = "";
     if (this.props.type === "delete") {
-      return (
-        <button className="btn btn-outline-danger" onClick={this.props.click}>
-          {this.props.children}
-        </button>
-      );
-    } else {
-      return (
-        <button className="btn btn-outline-warning" onClick={this.props.click}>
-          {this.props.children}
-        </button>
-      );
+      btnProps = "btn btn-outline-danger";
     }
+    if (this.props.type === "edit") {
+      btnProps = "btn btn-outline-warning";
+    }
+    if (this.props.type === "new") {
+      btnProps = "btn btn-outline-primary";
+    }
+    return (
+      <button className={btnProps} onClick={this.props.click}>
+        {this.props.children}
+      </button>
+    );
   }
 }
 

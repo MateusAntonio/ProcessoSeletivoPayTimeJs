@@ -32,3 +32,15 @@
   background-color: #ffc107;
   border-color: transparent;
 }
+
+.btn-outline-primary {
+  color: #007bff;
+  background-color: transparent;
+  border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
+  color: white;
+  background-color: #007bff;
+  border-color: transparent;
+}

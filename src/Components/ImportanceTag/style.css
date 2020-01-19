@@ -3,9 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
-}
-
-.text {
-  color: white;
+  border-radius: 4px;
+  opacity: 1;
+  border: 1px solid #d9d9d9;
 }

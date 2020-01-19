@@ -5,9 +5,74 @@ import ItemsTableComponent from "./Components/ItemsTableComponent/ItemsTableComp
 import ItemService from "./Services/ItemService";
 import ImportanceTag from "./Components/ImportanceTag/index";
 import Button from "./Components/Button";
-import { Divider } from "antd";
+import { Divider, Modal } from "antd";
 
 class App extends Component {
+  state = {
+    items: [],
+    modalVisible: false,
+    newItem: {
+      quantity: 0,
+      item_name: "",
+      importance: 3
+    }
+  };
+
+  setModalVisibility(visible) {
+    this.setState({ modalVisible: visible });
+  }
+
+  setQuantity(quantity) {
+    const { newItem } = this.state;
+    this.setState({
+      newItem: {
+        quantity: quantity,
+        item_name: newItem.item_name,
+        importance: newItem.importance
+      }
+    });
+  }
+  setItemName(name) {
+    const { newItem } = this.state;
+    this.setState({
+      newItem: {
+        quantity: newItem.quantity,
+        item_name: name,
+        importance: newItem.importance
+      }
+    });
+  }
+  setImportance(importance) {
+    const { newItem } = this.state;
+    this.setState({
+      newItem: {
+        quantity: newItem.quantity,
+        item_name: newItem.item_name,
+        importance: importance
+      }
+    });
+  }
+
+  deleteItem = async itemId => {
+    await ItemService.deleteItem(itemId);
+    const { items } = this.state;
+    const remainingArray = items.filter(item => item.id !== itemId);
+    this.setState({
+      items: remainingArray
+    });
+  };
+
+  handleSubmit = async event => {
+    event.preventDefault();
+    ItemService.createItem(this.state.newItem);
+    // Visando garantir a unicidade das keys, pegar o id do objeto no banco parece a opção mais segura
+    // em troca de requisição extra ao BD
+    const items = await ItemService.getItems();
+    this.setState({
+      items: items.map((item, key) => ({ ...item, key: item.id }))
+    });
+  };
+
   columns = [
     {
       title: "Quantity",
@@ -33,38 +98,25 @@ class App extends Component {
     {
       title: "Action",
       key: "action",
-      render: () => {
+      render: (text, record) => {
         return (
           <>
-            <Button>Edit</Button>
+            <Button type="edit"> Editar</Button>
             <Divider type="vertical"></Divider>
-            <Button type="delete">Delete</Button>
+            <Button type="delete" click={() => this.deleteItem(record.id)}>
+              Deletar
+            </Button>
           </>
         );
       }
     }
   ];
-
-  state = {
-    items: []
-  };
   async componentDidMount() {
     const items = await ItemService.getItems();
-    // A biblioteca recomenda que cada elemento tenha uma key unica
+    // A biblioteca recomenda que cada elemento tenha uma key unicas.
     this.setState({
-      items: items.map((item, key) => ({ ...item, key }))
+      items: items.map(item => ({ ...item, key: item.id }))
     });
-    // ItemService.createItem({
-    //   item_name: "creme de leite",
-    //   importance: "1",
-    //   quantity: "2"
-    // });
-    // ItemService.updateItem(39, {
-    //   item_name: "creme de abacate",
-    //   importance: "25",
-    //   quantity: "5"
-    // });
-    // ItemService.deleteItem(39);
   }
 
   render() {
@@ -74,6 +126,85 @@ class App extends Component {
           columns={this.columns}
           dataSource={this.state.items}
         ></ItemsTableComponent>
+        <Button type="new" click={() => this.setModalVisibility(true)}>
+          Novo
+        </Button>
+        <Modal
+          title="Preencha os campos"
+          visible={this.state.modalVisible}
+          onCancel={() => this.setModalVisibility(false)}
+          onOk={() => this.setModalVisibility(false)}
+        >
+          <form>
+            <div className="input-block">
+              <label>Quantidade</label>
+              <input
+                type="number"
+                name="quantity"
+                onChange={e => {
+                  this.setQuantity(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="input-block">
+              <label>Nome do item</label>
+              <input
+                type="text"
+                name="item_name"
+                onChange={e => {
+                  this.setItemName(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="input-block">
+              <label id="importance">Importancia</label>
+
+              <div className="radio-group">
+                <input
+                  type="radio"
+                  name="importance"
+                  value="3"
+                  onChange={e => {
+                    this.setImportance(e.target.value);
+                  }}
+                />
+                <label>Baixa</label>
+              </div>
+
+              <div className="radio-group">
+                <input
+                  type="radio"
+                  name="importance"
+                  value="2"
+                  onChange={e => {
+                    this.setImportance(e.target.value);
+                  }}
+                />
+                <label>Média</label>
+              </div>
+
+              <div className="radio-group">
+                <input
+                  type="radio"
+                  name="importance"
+                  value="1"
+                  onChange={e => {
+                    this.setImportance(e.target.value);
+                  }}
+                />
+                <label>Alta</label>
+              </div>
+            </div>
+
+            <input
+              type="submit"
+              value="Criar"
+              onClick={this.handleSubmit}
+            ></input>
+          </form>
+        </Modal>
       </div>
     );
   }

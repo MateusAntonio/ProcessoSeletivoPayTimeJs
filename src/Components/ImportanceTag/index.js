@@ -6,14 +6,29 @@ import "./style.css";
 // likda com a escolha de cor e texto para a tag
 class ImportanceTag extends Component {
   getColor(importance) {
+    let style = {
+      color: "#fa541c",
+      backgroundColor: "#fff2e8",
+      borderColor: "#ffbb96"
+    };
     if (importance === 2) {
-      return "blue";
+      style = {
+        color: "#2f54eb",
+        backgroundColor: "#f0f5ff",
+        borderColor: "#adc6ff"
+      };
+      return style;
     }
     if (importance === 3) {
-      return "green";
+      style = {
+        color: "#52c41a",
+        backgroundColor: "#f6ffed",
+        borderColor: "#b7eb8f"
+      };
+      return style;
     }
     // default
-    return "red";
+    return style;
   }
 
   getLabel(importance) {
@@ -35,12 +50,12 @@ class ImportanceTag extends Component {
       return <div />;
     }
 
-    const color = this.getColor(intImportance);
+    const style = this.getColor(intImportance);
     const label = this.getLabel(intImportance);
 
     return (
-      <div className="container" style={{ backgroundColor: color }}>
-        <span className="text">{label}</span>
+      <div className="container" style={style}>
+        <span>{label}</span>
       </div>
     );
   }
