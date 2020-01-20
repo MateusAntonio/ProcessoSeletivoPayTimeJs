@@ -5,13 +5,14 @@ import ItemsTableComponent from "./Components/ItemsTableComponent/ItemsTableComp
 import ItemService from "./Services/ItemService";
 import ImportanceTag from "./Components/ImportanceTag/index";
 import Button from "./Components/Button";
-import { Divider, Modal, Popconfirm, message } from "antd";
+import { Divider, Popconfirm, message } from "antd";
+import ItemModal from "./Components/ItemModal/ItemModal";
 
 class App extends Component {
   state = {
     items: [],
-    modalVisible: false,
-    editingMode: false,
+    isModalVisible: false,
+    isEditingMode: false,
     newItem: {
       quantity: 0,
       item_name: "",
@@ -20,12 +21,12 @@ class App extends Component {
     newItemId: 0
   };
 
-  setModalVisibility(visible) {
-    this.setState({ modalVisible: visible });
+  setModalVisibility(visibility) {
+    this.setState({ isModalVisible: visibility });
   }
 
-  setEditingMode(edit) {
-    this.setState({ editingMode: edit });
+  setisEditingMode(edit) {
+    this.setState({ isEditingMode: edit });
   }
 
   setQuantity(quantity) {
@@ -137,7 +138,7 @@ class App extends Component {
                   newItem: record,
                   newItemId: record.id
                 });
-                this.setEditingMode(true);
+                this.setisEditingMode(true);
                 this.setModalVisibility(true);
               }}
             >
@@ -189,96 +190,18 @@ class App extends Component {
         >
           Novo
         </Button>
-        <Modal
-          title="Preencha os campos"
-          visible={this.state.modalVisible}
-          onCancel={() => {
-            this.setModalVisibility(false);
-            this.setEditingMode(false);
-          }}
-          onOk={() => {
-            if (this.state.editingMode) {
-              this.handleEditItem();
-            } else {
-              this.handleCreateItem();
-            }
-            this.setModalVisibility(false);
-            this.setEditingMode(false);
-          }}
-        >
-          <form>
-            <div className="input-block">
-              <label>Quantidade</label>
-              <input
-                type="number"
-                name="quantity"
-                min="0"
-                required
-                value={this.state.newItem.quantity}
-                onChange={e => {
-                  this.setQuantity(e.target.value);
-                }}
-              />
-            </div>
-
-            <div className="input-block">
-              <label>Nome do item</label>
-              <input
-                type="text"
-                name="item_name"
-                required
-                value={this.state.newItem.item_name}
-                onChange={e => {
-                  this.setItemName(e.target.value);
-                }}
-              />
-            </div>
-
-            <div className="input-block">
-              <label id="importance">Importancia</label>
-
-              <div className="radio-group">
-                <input
-                  type="radio"
-                  name="importance"
-                  value="3"
-                  checked={this.state.newItem.importance === 3}
-                  required
-                  onChange={e => {
-                    this.setImportance(e.target.value);
-                  }}
-                />
-                <label>Baixa</label>
-              </div>
-
-              <div className="radio-group">
-                <input
-                  type="radio"
-                  name="importance"
-                  value="2"
-                  checked={this.state.newItem.importance === 2}
-                  onChange={e => {
-                    this.setImportance(e.target.value);
-                  }}
-                />
-                <label>Média</label>
-              </div>
-
-              <div className="radio-group">
-                <input
-                  type="radio"
-                  name="importance"
-                  value="1"
-                  checked={this.state.newItem.importance === 1}
-                  onChange={e => {
-                    this.setImportance(e.target.value);
-                  }}
-                />
-                <label>Alta</label>
-              </div>
-            </div>
-          </form>
-        </Modal>
+        <ItemModal
+          isModalVisible={this.state.isModalVisible}
+          isEditingMode={this.state.isEditingMode}
+          newItem={this.state.newItem}
+          setModalVisibility={this.setModalVisibility.bind(this)}
+          setisEditingMode={this.setisEditingMode.bind(this)}
+          handleCreateItem={this.handleCreateItem.bind(this)}
+          handleEditItem={this.handleEditItem.bind(this)}
+          setQuantity={this.setQuantity.bind(this)}
+          setItemName={this.setItemName.bind(this)}
+          setImportance={this.setImportance.bind(this)}
+        ></ItemModal>
       </div>
     );
   }
