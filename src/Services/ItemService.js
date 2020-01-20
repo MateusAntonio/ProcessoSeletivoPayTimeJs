@@ -1,21 +1,13 @@
 import { request } from "./index";
-// method: 'post',
-// url: '/user/12345',
-// data: {
-//   firstName: 'Fred',
-//   lastName: 'Flintstone'
-// }
 
-// Apesar da funcao nao utilizar await, eu marquei como async para
-// que fique claro que ela retorna uma promessa
-async function getItems() {
+function getItems() {
   return request({
     method: "get",
     url: "/listaCompra"
   });
 }
 
-async function createItem(data) {
+function createItem(data) {
   return request({
     method: "post",
     url: "/addItem",
@@ -23,7 +15,7 @@ async function createItem(data) {
   });
 }
 
-async function updateItem(itemId, data) {
+function updateItem(itemId, data) {
   return request({
     method: "put",
     url: `/updateItem/${itemId}`,
@@ -31,7 +23,7 @@ async function updateItem(itemId, data) {
   });
 }
 
-async function deleteItem(itemId) {
+function deleteItem(itemId) {
   return request({
     method: "delete",
     url: `/deleteItem/${itemId}`

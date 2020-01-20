@@ -1,35 +1,38 @@
 import React, { Component } from "react";
+import { message } from "antd";
+
 import "./App.css";
 import "antd/dist/antd.css";
-import ItemsTableComponent from "./Components/ItemsTableComponent/ItemsTableComponent";
-import ItemService from "./Services/ItemService";
-import ImportanceTag from "./Components/ImportanceTag/index";
-import Button from "./Components/Button";
-import { Divider, Popconfirm, message } from "antd";
+
+import ItemsTable from "./Components/ItemsTable/ItemsTable";
 import ItemModal from "./Components/ItemModal/ItemModal";
+import ItemService from "./Services/ItemService";
+import Button from "./Components/Button";
+
+const cleanItem = {
+  quantity: 0,
+  item_name: "",
+  importance: 0
+};
 
 class App extends Component {
   state = {
     items: [],
     isModalVisible: false,
     isEditingMode: false,
-    newItem: {
-      quantity: 0,
-      item_name: "",
-      importance: 0
-    },
+    newItem: cleanItem,
     newItemId: 0
   };
 
-  setModalVisibility(visibility) {
+  setModalVisibility = visibility => {
     this.setState({ isModalVisible: visibility });
-  }
+  };
 
-  setisEditingMode(edit) {
+  setIsEditingMode = edit => {
     this.setState({ isEditingMode: edit });
-  }
+  };
 
-  setQuantity(quantity) {
+  setQuantity = quantity => {
     const { newItem } = this.state;
     this.setState({
       newItem: {
@@ -38,8 +41,8 @@ class App extends Component {
         importance: +newItem.importance
       }
     });
-  }
-  setItemName(name) {
+  };
+  setItemName = name => {
     const { newItem } = this.state;
     this.setState({
       newItem: {
@@ -48,8 +51,8 @@ class App extends Component {
         importance: +newItem.importance
       }
     });
-  }
-  setImportance(importance) {
+  };
+  setImportance = importance => {
     const { newItem } = this.state;
     this.setState({
       newItem: {
@@ -58,7 +61,7 @@ class App extends Component {
         importance: +importance
       }
     });
-  }
+  };
 
   handleDeleteItem = async itemId => {
     await ItemService.deleteItem(itemId);
@@ -76,20 +79,10 @@ class App extends Component {
     // em troca de requisição extra ao BD
     const items = await ItemService.getItems();
     this.setItems(items);
-    //Deveria checar o status da resposta para garantir a criação
+    //Checa se retornou algum dado para saber se houve sucesso na requisição
     if (data) {
       message.success("Item criado!");
     }
-  };
-
-  setItems = async items => {
-    this.setState({
-      items: items.map(item => ({
-        ...item,
-        key: item.id,
-        importance: +item.importance
-      }))
-    });
   };
 
   handleEditItem = async () => {
@@ -103,87 +96,43 @@ class App extends Component {
     }
   };
 
-  columns = [
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      editable: true
-    },
-    {
-      title: "Name",
-      dataIndex: "item_name",
-      key: "item_name",
-      editable: true
-    },
-    {
-      title: "Importance",
-      dataIndex: "importance",
-      key: "importance",
-      editable: true,
-      render: importance => (
-        <ImportanceTag importance={importance}>{importance}</ImportanceTag>
-      )
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => {
-        return (
-          <>
-            <Button
-              type="edit"
-              click={() => {
-                this.setState({
-                  newItem: record,
-                  newItemId: record.id
-                });
-                this.setisEditingMode(true);
-                this.setModalVisibility(true);
-              }}
-            >
-              {" "}
-              Editar
-            </Button>
-            <Divider type="vertical"></Divider>
-            <Popconfirm
-              title="Deseja realmente apagar o item?"
-              onConfirm={() => this.handleDeleteItem(record.id)}
-              okText="Sim"
-              cancelText="Não"
-            >
-              <button className="btn btn-outline-danger">Deletar</button>
-            </Popconfirm>
-          </>
-        );
-        //TODO: Entender o motivo de não funcionar com Button
-      }
-    }
-  ];
-  async componentDidMount() {
+  handleEditClick = item => {
+    this.setState({
+      newItem: item,
+      newItemId: item.id
+    });
+  };
+
+  setItems = async items => {
+    this.setState({
+      items: items.map(item => ({
+        ...item,
+        key: item.id,
+        importance: +item.importance
+      }))
+    });
+  };
+
+  componentDidMount = async () => {
     const items = await ItemService.getItems();
-    // A biblioteca recomenda que cada elemento tenha uma key unicas.
-    // Além disso a gente forca que importancia seja um inteiro
     this.setItems(items);
-  }
+  };
 
   render() {
     return (
       <div>
-        <ItemsTableComponent
-          columns={this.columns}
+        <ItemsTable
+          setIsEditingMode={this.setIsEditingMode}
+          setModalVisibility={this.setModalVisibility}
+          handleEditClick={this.handleEditClick}
+          handleDeleteItem={this.handleDeleteItem}
           dataSource={this.state.items}
-        ></ItemsTableComponent>
+        ></ItemsTable>
         <Button
           type="new"
           click={() => {
-            //Limpa os campos
             this.setState({
-              newItem: {
-                quantity: 0,
-                item_name: "",
-                importance: 0
-              }
+              newItem: cleanItem
             });
             this.setModalVisibility(true);
           }}
@@ -194,13 +143,13 @@ class App extends Component {
           isModalVisible={this.state.isModalVisible}
           isEditingMode={this.state.isEditingMode}
           newItem={this.state.newItem}
-          setModalVisibility={this.setModalVisibility.bind(this)}
-          setisEditingMode={this.setisEditingMode.bind(this)}
-          handleCreateItem={this.handleCreateItem.bind(this)}
-          handleEditItem={this.handleEditItem.bind(this)}
-          setQuantity={this.setQuantity.bind(this)}
-          setItemName={this.setItemName.bind(this)}
-          setImportance={this.setImportance.bind(this)}
+          setModalVisibility={this.setModalVisibility}
+          setIsEditingMode={this.setIsEditingMode}
+          handleCreateItem={this.handleCreateItem}
+          handleEditItem={this.handleEditItem}
+          setQuantity={this.setQuantity}
+          setItemName={this.setItemName}
+          setImportance={this.setImportance}
         ></ItemModal>
       </div>
     );

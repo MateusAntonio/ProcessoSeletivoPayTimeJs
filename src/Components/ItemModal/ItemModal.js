@@ -2,22 +2,34 @@ import React from "react";
 import { Modal } from "antd";
 
 const ItemModal = props => {
+  const {
+    isModalVisible,
+    isEditingMode,
+    setModalVisibility,
+    setIsEditingMode,
+    handleEditItem,
+    handleCreateItem,
+    newItem,
+    setQuantity,
+    setItemName,
+    setImportance
+  } = props;
   return (
     <Modal
       title="Preencha os campos"
-      visible={props.isModalVisible}
+      visible={isModalVisible}
       onCancel={() => {
-        props.setModalVisibility(false);
-        props.setisEditingMode(false);
+        setModalVisibility(false);
+        setIsEditingMode(false);
       }}
       onOk={() => {
-        if (props.isEditingMode) {
-          props.handleEditItem();
+        if (isEditingMode) {
+          handleEditItem();
         } else {
-          props.handleCreateItem();
+          handleCreateItem();
         }
-        props.setModalVisibility(false);
-        props.setisEditingMode(false);
+        setModalVisibility(false);
+        setIsEditingMode(false);
       }}
     >
       <form>
@@ -28,9 +40,9 @@ const ItemModal = props => {
             name="quantity"
             min="0"
             required
-            value={props.newItem.quantity}
+            value={newItem.quantity}
             onChange={e => {
-              props.setQuantity(e.target.value);
+              setQuantity(e.target.value);
             }}
           />
         </div>
@@ -41,9 +53,9 @@ const ItemModal = props => {
             type="text"
             name="item_name"
             required
-            value={props.newItem.item_name}
+            value={newItem.item_name}
             onChange={e => {
-              props.setItemName(e.target.value);
+              setItemName(e.target.value);
             }}
           />
         </div>
@@ -56,10 +68,10 @@ const ItemModal = props => {
               type="radio"
               name="importance"
               value="3"
-              checked={props.newItem.importance === 3}
+              checked={newItem.importance === 3}
               required
               onChange={e => {
-                props.setImportance(e.target.value);
+                setImportance(e.target.value);
               }}
             />
             <label>Baixa</label>
@@ -70,9 +82,9 @@ const ItemModal = props => {
               type="radio"
               name="importance"
               value="2"
-              checked={props.newItem.importance === 2}
+              checked={newItem.importance === 2}
               onChange={e => {
-                props.setImportance(e.target.value);
+                setImportance(e.target.value);
               }}
             />
             <label>Média</label>
@@ -83,9 +95,9 @@ const ItemModal = props => {
               type="radio"
               name="importance"
               value="1"
-              checked={props.newItem.importance === 1}
+              checked={newItem.importance === 1}
               onChange={e => {
-                props.setImportance(e.target.value);
+                setImportance(e.target.value);
               }}
             />
             <label>Alta</label>
