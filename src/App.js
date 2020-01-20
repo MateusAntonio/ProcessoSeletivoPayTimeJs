@@ -5,21 +5,27 @@ import ItemsTableComponent from "./Components/ItemsTableComponent/ItemsTableComp
 import ItemService from "./Services/ItemService";
 import ImportanceTag from "./Components/ImportanceTag/index";
 import Button from "./Components/Button";
-import { Divider, Modal } from "antd";
+import { Divider, Modal, Popconfirm, message } from "antd";
 
 class App extends Component {
   state = {
     items: [],
     modalVisible: false,
+    editingMode: false,
     newItem: {
       quantity: 0,
       item_name: "",
-      importance: 3
-    }
+      importance: 0
+    },
+    newItemId: 0
   };
 
   setModalVisibility(visible) {
     this.setState({ modalVisible: visible });
+  }
+
+  setEditingMode(edit) {
+    this.setState({ editingMode: edit });
   }
 
   setQuantity(quantity) {
@@ -53,24 +59,41 @@ class App extends Component {
     });
   }
 
-  deleteItem = async itemId => {
+  handleDeleteItem = async itemId => {
     await ItemService.deleteItem(itemId);
     const { items } = this.state;
     const remainingArray = items.filter(item => item.id !== itemId);
     this.setState({
       items: remainingArray
     });
+    message.success("Item deletado com sucesso!");
   };
 
-  handleSubmit = async event => {
-    event.preventDefault();
-    ItemService.createItem(this.state.newItem);
+  handleCreateItem = async () => {
+    const data = await ItemService.createItem(this.state.newItem);
     // Visando garantir a unicidade das keys, pegar o id do objeto no banco parece a opção mais segura
     // em troca de requisição extra ao BD
     const items = await ItemService.getItems();
     this.setState({
-      items: items.map((item, key) => ({ ...item, key: item.id }))
+      items: items.map(item => ({ ...item, key: item.id }))
     });
+    //Deveria checar o status da resposta para garantir a criação
+    if (data) {
+      message.success("Item criado!");
+    }
+  };
+
+  handleEditItem = async () => {
+    const itemId = this.state.newItemId;
+    const data = await ItemService.updateItem(itemId, this.state.newItem);
+    const items = await ItemService.getItems();
+    this.setState({
+      items: items.map(item => ({ ...item, key: item.id }))
+    });
+    //Deveria checar o status da resposta para garantir a criação
+    if (data) {
+      message.success("Item editado!");
+    }
   };
 
   columns = [
@@ -101,13 +124,36 @@ class App extends Component {
       render: (text, record) => {
         return (
           <>
-            <Button type="edit"> Editar</Button>
-            <Divider type="vertical"></Divider>
-            <Button type="delete" click={() => this.deleteItem(record.id)}>
-              Deletar
+            <Button
+              type="edit"
+              click={() => {
+                this.setState({
+                  newItem: {
+                    quantity: record.quantity,
+                    item_name: record.item_name,
+                    importance: record.importance
+                  },
+                  newItemId: record.id
+                });
+                this.setEditingMode(true);
+                this.setModalVisibility(true);
+              }}
+            >
+              {" "}
+              Editar
             </Button>
+            <Divider type="vertical"></Divider>
+            <Popconfirm
+              title="Deseja realmente apagar o item?"
+              onConfirm={() => this.handleDeleteItem(record.id)}
+              okText="Sim"
+              cancelText="Não"
+            >
+              <button className="btn btn-outline-danger">Deletar</button>
+            </Popconfirm>
           </>
         );
+        //TODO: Entender o motivo de não funcionar com Button
       }
     }
   ];
@@ -120,20 +166,63 @@ class App extends Component {
   }
 
   render() {
+    // let submit = (
+    //   <input
+    //     id="create"
+    //     type="submit"
+    //     value="Criar"
+    //     onClick={this.handleCreateItem}
+    //   ></input>
+    // );
+    // if (this.state.editingMode) {
+    //   submit = (
+    //     <input
+    //       id="edit"
+    //       type="submit"
+    //       value="Editar"
+    //       onClick={this.handleEditItem}
+    //     ></input>
+    //   );
+    // }
+
     return (
       <div>
         <ItemsTableComponent
           columns={this.columns}
           dataSource={this.state.items}
         ></ItemsTableComponent>
-        <Button type="new" click={() => this.setModalVisibility(true)}>
+        <Button
+          type="new"
+          click={() => {
+            //Limpa os campos
+            this.setState({
+              newItem: {
+                quantity: 0,
+                item_name: "",
+                importance: 0
+              }
+            });
+            this.setModalVisibility(true);
+          }}
+        >
           Novo
         </Button>
         <Modal
           title="Preencha os campos"
           visible={this.state.modalVisible}
-          onCancel={() => this.setModalVisibility(false)}
-          onOk={() => this.setModalVisibility(false)}
+          onCancel={() => {
+            this.setModalVisibility(false);
+            this.setEditingMode(false);
+          }}
+          onOk={() => {
+            if (this.state.editingMode) {
+              this.handleEditItem();
+            } else {
+              this.handleCreateItem();
+            }
+            this.setModalVisibility(false);
+            this.setEditingMode(false);
+          }}
         >
           <form>
             <div className="input-block">
@@ -141,6 +230,9 @@ class App extends Component {
               <input
                 type="number"
                 name="quantity"
+                min="0"
+                required
+                value={this.state.newItem.quantity}
                 onChange={e => {
                   this.setQuantity(e.target.value);
                 }}
@@ -152,6 +244,8 @@ class App extends Component {
               <input
                 type="text"
                 name="item_name"
+                required
+                value={this.state.newItem.item_name}
                 onChange={e => {
                   this.setItemName(e.target.value);
                 }}
@@ -166,6 +260,7 @@ class App extends Component {
                   type="radio"
                   name="importance"
                   value="3"
+                  required
                   onChange={e => {
                     this.setImportance(e.target.value);
                   }}
@@ -197,12 +292,6 @@ class App extends Component {
                 <label>Alta</label>
               </div>
             </div>
-
-            <input
-              type="submit"
-              value="Criar"
-              onClick={this.handleSubmit}
-            ></input>
           </form>
         </Modal>
       </div>
