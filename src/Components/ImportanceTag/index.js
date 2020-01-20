@@ -43,15 +43,9 @@ class ImportanceTag extends Component {
 
   render() {
     const { importance } = this.props;
-    const intImportance = +importance;
 
-    if (!intImportance) {
-      console.warning("Prop importance de tipo nao suportado");
-      return <div />;
-    }
-
-    const style = this.getColor(intImportance);
-    const label = this.getLabel(intImportance);
+    const style = this.getColor(importance);
+    const label = this.getLabel(importance);
 
     return (
       <div className="container" style={style}>

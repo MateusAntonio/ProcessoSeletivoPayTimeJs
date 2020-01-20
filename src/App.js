@@ -34,7 +34,7 @@ class App extends Component {
       newItem: {
         quantity: quantity,
         item_name: newItem.item_name,
-        importance: newItem.importance
+        importance: +newItem.importance
       }
     });
   }
@@ -44,7 +44,7 @@ class App extends Component {
       newItem: {
         quantity: newItem.quantity,
         item_name: name,
-        importance: newItem.importance
+        importance: +newItem.importance
       }
     });
   }
@@ -54,7 +54,7 @@ class App extends Component {
       newItem: {
         quantity: newItem.quantity,
         item_name: newItem.item_name,
-        importance: importance
+        importance: +importance
       }
     });
   }
@@ -74,22 +74,28 @@ class App extends Component {
     // Visando garantir a unicidade das keys, pegar o id do objeto no banco parece a opção mais segura
     // em troca de requisição extra ao BD
     const items = await ItemService.getItems();
-    this.setState({
-      items: items.map(item => ({ ...item, key: item.id }))
-    });
+    this.setItems(items);
     //Deveria checar o status da resposta para garantir a criação
     if (data) {
       message.success("Item criado!");
     }
   };
 
+  setItems = async items => {
+    this.setState({
+      items: items.map(item => ({
+        ...item,
+        key: item.id,
+        importance: +item.importance
+      }))
+    });
+  };
+
   handleEditItem = async () => {
     const itemId = this.state.newItemId;
     const data = await ItemService.updateItem(itemId, this.state.newItem);
     const items = await ItemService.getItems();
-    this.setState({
-      items: items.map(item => ({ ...item, key: item.id }))
-    });
+    this.setItems(items);
     //Deveria checar o status da resposta para garantir a criação
     if (data) {
       message.success("Item editado!");
@@ -128,11 +134,7 @@ class App extends Component {
               type="edit"
               click={() => {
                 this.setState({
-                  newItem: {
-                    quantity: record.quantity,
-                    item_name: record.item_name,
-                    importance: record.importance
-                  },
+                  newItem: record,
                   newItemId: record.id
                 });
                 this.setEditingMode(true);
@@ -160,31 +162,11 @@ class App extends Component {
   async componentDidMount() {
     const items = await ItemService.getItems();
     // A biblioteca recomenda que cada elemento tenha uma key unicas.
-    this.setState({
-      items: items.map(item => ({ ...item, key: item.id }))
-    });
+    // Além disso a gente forca que importancia seja um inteiro
+    this.setItems(items);
   }
 
   render() {
-    // let submit = (
-    //   <input
-    //     id="create"
-    //     type="submit"
-    //     value="Criar"
-    //     onClick={this.handleCreateItem}
-    //   ></input>
-    // );
-    // if (this.state.editingMode) {
-    //   submit = (
-    //     <input
-    //       id="edit"
-    //       type="submit"
-    //       value="Editar"
-    //       onClick={this.handleEditItem}
-    //     ></input>
-    //   );
-    // }
-
     return (
       <div>
         <ItemsTableComponent
@@ -260,6 +242,7 @@ class App extends Component {
                   type="radio"
                   name="importance"
                   value="3"
+                  checked={this.state.newItem.importance === 3}
                   required
                   onChange={e => {
                     this.setImportance(e.target.value);
@@ -273,6 +256,7 @@ class App extends Component {
                   type="radio"
                   name="importance"
                   value="2"
+                  checked={this.state.newItem.importance === 2}
                   onChange={e => {
                     this.setImportance(e.target.value);
                   }}
@@ -285,6 +269,7 @@ class App extends Component {
                   type="radio"
                   name="importance"
                   value="1"
+                  checked={this.state.newItem.importance === 1}
                   onChange={e => {
                     this.setImportance(e.target.value);
                   }}
