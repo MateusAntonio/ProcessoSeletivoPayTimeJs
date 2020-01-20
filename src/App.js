@@ -96,7 +96,7 @@ class App extends Component {
     const data = await ItemService.updateItem(itemId, this.state.newItem);
     const items = await ItemService.getItems();
     this.setItems(items);
-    //Deveria checar o status da resposta para garantir a criação
+    //Checa se retornou algum dado para saber se houve sucesso na requisição
     if (data) {
       message.success("Item editado!");
     }
