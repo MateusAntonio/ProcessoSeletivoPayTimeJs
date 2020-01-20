@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React from "react";
 import "./style.css";
 
-// Esse componente é bem especifico para o que estou usando ele, mas ele pode
-// facilmente ser refatorado para ser mais generico e tendo um wrapper component que
-// likda com a escolha de cor e texto para a tag
-class ImportanceTag extends Component {
-  getColor(importance) {
+// Esse componente é bem especifico para o que está sendo usado, mas pode
+// facilmente ser refatorado para que seja mais generico e para que tenha um wrapper component que
+// lida com a escolha de cor e texto para a tag
+const ImportanceTag = props => {
+  const getColor = importance => {
     let style = {
       color: "#fa541c",
       backgroundColor: "#fff2e8",
@@ -29,9 +29,9 @@ class ImportanceTag extends Component {
     }
     // default
     return style;
-  }
+  };
 
-  getLabel(importance) {
+  const getLabel = importance => {
     if (importance === 2) {
       return "Média";
     }
@@ -39,20 +39,17 @@ class ImportanceTag extends Component {
       return "Baixa";
     }
     return "Alta";
-  }
+  };
 
-  render() {
-    const { importance } = this.props;
+  const { importance } = props;
+  const style = getColor(importance);
+  const label = getLabel(importance);
 
-    const style = this.getColor(importance);
-    const label = this.getLabel(importance);
-
-    return (
-      <div className="container" style={style}>
-        <span>{label}</span>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="container" style={style}>
+      <span>{label}</span>
+    </div>
+  );
+};
 
 export default ImportanceTag;

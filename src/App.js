@@ -4,8 +4,8 @@ import { message } from "antd";
 import "./App.css";
 import "antd/dist/antd.css";
 
-import ItemsTable from "./Components/ItemsTable/ItemsTable";
-import ItemModal from "./Components/ItemModal/ItemModal";
+import ItemsTable from "./Components/ItemsTable";
+import ItemModal from "./Components/ItemModal";
 import ItemService from "./Services/ItemService";
 import Button from "./Components/Button";
 
