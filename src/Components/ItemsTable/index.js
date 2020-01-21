@@ -5,13 +5,7 @@ import ImportanceTag from "../ImportanceTag";
 import Button from "../Button";
 
 const ItemsTable = props => {
-  const {
-    setIsEditingMode,
-    setModalVisibility,
-    handleEditClick,
-    handleDeleteItem,
-    dataSource
-  } = props;
+  const { handleEditClick, handleDeleteItem, dataSource } = props;
 
   const columns = [
     {
@@ -42,8 +36,6 @@ const ItemsTable = props => {
               type="edit"
               click={() => {
                 handleEditClick(record);
-                setIsEditingMode(true);
-                setModalVisibility(true);
               }}
             >
               {" "}

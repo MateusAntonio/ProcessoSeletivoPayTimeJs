@@ -101,6 +101,15 @@ class App extends Component {
       newItem: item,
       newItemId: item.id
     });
+    this.setIsEditingMode(true);
+    this.setModalVisibility(true);
+  };
+
+  handleCreateClick = () => {
+    this.setState({
+      newItem: cleanItem
+    });
+    this.setModalVisibility(true);
   };
 
   setItems = async items => {
@@ -122,21 +131,11 @@ class App extends Component {
     return (
       <div>
         <ItemsTable
-          setIsEditingMode={this.setIsEditingMode}
-          setModalVisibility={this.setModalVisibility}
           handleEditClick={this.handleEditClick}
           handleDeleteItem={this.handleDeleteItem}
           dataSource={this.state.items}
         ></ItemsTable>
-        <Button
-          type="new"
-          click={() => {
-            this.setState({
-              newItem: cleanItem
-            });
-            this.setModalVisibility(true);
-          }}
-        >
+        <Button type="new" click={this.handleCreateClick}>
           Novo
         </Button>
         <ItemModal

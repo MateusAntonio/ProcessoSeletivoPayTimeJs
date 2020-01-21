@@ -6,29 +6,26 @@ import "./style.css";
 // lida com a escolha de cor e texto para a tag
 const ImportanceTag = props => {
   const getColor = importance => {
-    let style = {
-      color: "#fa541c",
-      backgroundColor: "#fff2e8",
-      borderColor: "#ffbb96"
-    };
     if (importance === 2) {
-      style = {
+      return {
         color: "#2f54eb",
         backgroundColor: "#f0f5ff",
         borderColor: "#adc6ff"
       };
-      return style;
     }
     if (importance === 3) {
-      style = {
+      return {
         color: "#52c41a",
         backgroundColor: "#f6ffed",
         borderColor: "#b7eb8f"
       };
-      return style;
     }
     // default
-    return style;
+    return {
+      color: "#fa541c",
+      backgroundColor: "#fff2e8",
+      borderColor: "#ffbb96"
+    };
   };
 
   const getLabel = importance => {
