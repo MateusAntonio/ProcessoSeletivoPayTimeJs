@@ -129,7 +129,7 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <>
         <ItemsTable
           handleEditClick={this.handleEditClick}
           handleDeleteItem={this.handleDeleteItem}
@@ -150,7 +150,7 @@ class App extends Component {
           setItemName={this.setItemName}
           setImportance={this.setImportance}
         ></ItemModal>
-      </div>
+      </>
     );
   }
 }
